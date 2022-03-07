@@ -1,0 +1,31 @@
+            try {
+                Properties p = new Properties();
+                p.setProperty(Context.PROVIDER_URL, "mq://localhost:7676");
+
+                InitialContext ic = new InitialContext();
+
+                Queue queue = (Queue) ic.lookup("jms/ictqueue");
+                ConnectionFactory cf = (ConnectionFactory) ic.lookup("jms/ictqueueFactory");
+                Connection con = cf.createConnection();
+                Session session = con.createSession();
+                MessageProducer mp = session.createProducer(queue);
+                TextMessage tm = session.createTextMessage();
+                tm.setText(" I am a queue message");
+                mp.send(tm);
+                con.close();
+
+                InitialContext ic1 = new InitialContext();
+
+                Topic topic = (Topic) ic1.lookup("jms/icttopic");
+                TopicConnectionFactory tcf = (TopicConnectionFactory) ic1.lookup("jms/icttopicFactory");
+                TopicConnection tcon = tcf.createTopicConnection();
+                TopicSession tsession = tcon.createTopicSession(true, 0);
+                TopicPublisher tpub = tsession.createPublisher(topic);
+                TextMessage tm1 = tsession.createTextMessage();
+                tm1.setText("I am a Topic Message");
+                tpub.publish(tm1);
+                tcon.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
